@@ -1,26 +1,18 @@
-'''
-Created on 30 Jan, 2015
-
-@author: kejie_huang
-'''
 
 import matplotlib.pyplot as plt
 import serial
 import string
 from drawnow import *
-
+import math 
 from time import time
+from threading import Thread 
 
 pressure =0
 altitude =0
 tempertaure =0
 level =0
-roll=0
-pitch=0
-accz=0
-rollarray = [0,0,0]
-pitcharray=[0,0,0]
-acczarray=[0,0,0]
+gyroangle=0
+gyroangle1=0
 
 STEParray=[]
 STEPLENGTHarray=[]
@@ -35,14 +27,8 @@ level=1
 pressure=1013.25
 distance0=0
 distance1=0
-STEP=0
+STEP =0
 altitude=0
-calroll0 = 0
-calroll1 = 0
-calpitch0 = 0
-calpitch1 = 0
-stage = 0
-sign = 0
 
 
 plt.ion()
@@ -51,23 +37,6 @@ plt.show()
 
 ##leglength() = float(1)
 
-def calculateStep():
-    STEP = STEP + 1
-    STEParray.append(STEP)
-    STEPLENGTH = 1
-    STEPLENGTHarray.append(STEPLENGTH)
-    POSITIONX = 1
-    XARRAY.append(POSITIONX)
-    POSITIONY=1
-    YARRAY.append(POSITIONY)
-    X_offset = POSITIONX
-    Y_offset = POSITIONY
-    distance0 = 1 ##LINE
-    distance1 = 1 ##WALK
-    drawnow(makFIG)
-    
-    
-    
 
 def makeFig(): #create a function that makes our desired plot
     plt.xlim(-10+X_offset,10+X_offset)
@@ -84,7 +53,7 @@ def makeFig(): #create a function that makes our desired plot
     plt.text(-8+X_offset,7+Y_offset,'N',color='red',fontsize=15)
     plt.text(-7+X_offset,8+Y_offset,'W',color='red',fontsize=15)
     #plt.text(8,9,'LV='.format(TEXT))
-    plt.text(6+X_offset,9.25+Y_offset,'LV=',color='red',fontsize=12)
+    plt.text(6+X_offset,9.25+Y_offset,'LEVEL=',color='red',fontsize=12)
     plt.text(8.5+X_offset,9.25+Y_offset,level,color='red',fontsize=12)
     plt.text(6+X_offset,8.5+Y_offset,'P=',color='blue',fontsize=12)
     plt.text(7.5+X_offset,8.5+Y_offset,pressure,color='blue',fontsize=12)
@@ -106,7 +75,7 @@ def makeFig(): #create a function that makes our desired plot
 #            arrowprops=dict(facecolor='black', shrink=0.00))
 
 # Check your COM port and baud rate
-ser = serial.Serial(port='COM3',baudrate=115200, parity=serial.PARITY_NONE, timeout= None)
+ser = serial.Serial(port='COM4',baudrate=115200, parity=serial.PARITY_NONE, timeout= None)
 
 f = open("Serial"+str(time())+".txt", 'w')
 
@@ -123,44 +92,36 @@ while 1:
     
     if len(words) > 2:
         
-        roll = float(words[0])
-        pitch = float(words[1])
-        accz = float(words[2])
-        pressure = float(words[3])
-        altitude = float(words[4])
-        temperature = float(words[5])
-        level = int(words[6])
+        gyroangle = float(words[0]) ##leg angle
+        gyroangle1 += float(words[1])    ##directional angle
+        pressure = float(words[2])
+        altitude = float(words[3])
+        temperature = float(words[4])
+        level = int(words[5])
+    
+        STEP += 1
+        STEParray.append(STEP)
+        STEPLENGTH = 2*math.sin(gyroangle/2/180*math.pi)
+        STEPLENGTHarray.append(STEPLENGTH)
+        POSITIONX += STEPLENGTH*math.cos(gyroangle1/180*math.pi)
+        XARRAY.append(POSITIONX)
+        POSITIONY+= STEPLENGTH*math.sin(gyroangle1/180*math.pi)
+        YARRAY.append(POSITIONY)
+        X_offset = POSITIONX
+        Y_offset = POSITIONY
+        distance0 = sum(STEPLENGTHarray) ##LINE
+        distance1 = math.sqrt(POSITIONX*POSITIONX+POSITIONY*POSITIONY) ##WALK
+        ##drawnow(makeFig)
+        thread = Thread(drawnow(makeFig))
+        thread.start()
+        thread.join()
+        
 
-        if state == 0:
-            calroll0 = roll
-            callpitch0 = pitch
-            state =1
-            
-        rollarray.append(roll)
-        del rollarray[0]
-
-        pitcharray.append(pitch)
-        del pitcharray[0]
-
-        acczarray.append(accz)
-        del acczarray[0]
-
-        sign = (rollarray[2]-rollarray[1])/(rollarray[1]-rollarray[0])
-
-        if acczarray[1]>acczarray[0] and acczarray[1]>acczarray[2] and state == 1:
-            calpitch1=pitcharray[1]
-            callroll1=rollarray[1]
-            calculatestep()
-            state = 2
-
-        if sign < 0 and state ==2:
-            calpitch0=pitcharray[1]
-            calroll0=rollarray[1]
-            state = 1
+        
  
 
         ##time.sleep(0.00001)    
-        plt.pause(.000001)#sthash.l3R0774z.dpuf
+        ##plt.pause(.000001)#sthash.l3R0774z.dpuf
         #cnt = cnt + 1
         #if(cnt>200):
          #   STEParray.pop(0)

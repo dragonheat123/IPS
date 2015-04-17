@@ -33,11 +33,14 @@ void printdata(void)
       //Serial.print("!");
 
       #if PRINT_EULER == 1
-      Serial.print(ToDeg(roll));
-      Serial.print(",");
+      
       Serial.print(ToDeg(pitch));
       Serial.print(",");
-      Serial.print(compass.a.z);
+      Serial.print(ToDeg(yaw));
+      Serial.print(",");
+      Serial.print(ToDeg(roll));
+      Serial.print(",");
+      Serial.print(compass.a.y/100);
       Serial.print(",");
       Serial.print(pressure);
       Serial.print(",");

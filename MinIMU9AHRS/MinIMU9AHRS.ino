@@ -3,6 +3,11 @@
 LPS ps;
 
 float F0, F1, F2, F3, F4, F5, F6, F7;
+float pressure;
+float altitude;
+float temperature;
+int level;
+
 
 // Uncomment the below line to use this axis definition: 
    // X axis pointing forward
@@ -43,12 +48,17 @@ int SENSOR_SIGN[9] = {1,1,1,-1,-1,-1,1,1,1}; //Correct directions x,y,z - gyro, 
 
 // LSM303 magnetometer calibration constants; use the Calibrate example from
 // the Pololu LSM303 library to find the right values for your board
-#define M_X_MIN -421
+#define M_X_MIN -187
 #define M_Y_MIN -639
 #define M_Z_MIN -238
 #define M_X_MAX 424
 #define M_Y_MAX 295
 #define M_Z_MAX 472
+
+
+//min: { -1334,   -155,  -1611}    max: { -1277,    -68,  -1574}
+
+
 
 #define Kp_ROLLPITCH 0.02
 #define Ki_ROLLPITCH 0.00002
@@ -235,11 +245,11 @@ void loop() //Main Loop
     Euler_angles();
     // ***
     
-  float pressure = ps.readPressureMillibars();
-  float altitude = ps.pressureToAltitudeMeters(pressure);
-  float temperature = ps.readTemperatureC();
+ pressure = ps.readPressureMillibars();
+ altitude = ps.pressureToAltitudeMeters(pressure);
+ temperature = ps.readTemperatureC();
 
-  int level=0;
+ level=0;
   
   if (altitude > F0 && altitude <F1){
     level = 1;
