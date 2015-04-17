@@ -213,6 +213,14 @@ void loop() {
          if (steplength<0.3){
            state=1; 
          }
+         if (gyroangle1<-15){
+           gyroangle -= 30;
+         }
+         if (gyroangle1>15){
+           gyroangle += 30;
+         }
+         
+         
        }
      };
      
@@ -230,7 +238,7 @@ void loop() {
 //        Serial.print(",");
         Serial.print(gyroangle);
         Serial.print(",");
-        Serial.print(-gyroangle1);
+        Serial.print(gyroangle1);
         Serial.print(",");
         Serial.print(pressure);
         Serial.print(",");

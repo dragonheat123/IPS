@@ -92,7 +92,7 @@ while 1:
     
     if len(words) > 2:
         
-        gyroangle = float(words[0]) ##leg angle
+        gyroangle = float(words[0])*1.2 ##leg angle
         gyroangle1 += float(words[1])    ##directional angle
         pressure = float(words[2])
         altitude = float(words[3])
@@ -101,11 +101,11 @@ while 1:
     
         STEP += 1
         STEParray.append(STEP)
-        STEPLENGTH = 2*math.sin(gyroangle/2/180*math.pi)
+        STEPLENGTH = 2.5*math.sin(gyroangle/2/180*math.pi)
         STEPLENGTHarray.append(STEPLENGTH)
-        POSITIONX += STEPLENGTH*math.cos(gyroangle1/180*math.pi)
+        POSITIONX += STEPLENGTH*math.cos(gyroangle1/90*math.pi)
         XARRAY.append(POSITIONX)
-        POSITIONY+= STEPLENGTH*math.sin(gyroangle1/180*math.pi)
+        POSITIONY+= STEPLENGTH*math.sin(gyroangle1/90*math.pi)
         YARRAY.append(POSITIONY)
         X_offset = POSITIONX
         Y_offset = POSITIONY
