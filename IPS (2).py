@@ -101,7 +101,7 @@ while 1:
     
         STEP += 1
         STEParray.append(STEP)
-        STEPLENGTH = 2.7*math.sin(gyroangle/2/180*math.pi)
+        STEPLENGTH = 3.6*math.sin(gyroangle/2/180*math.pi)
         STEPLENGTHarray.append(STEPLENGTH)
         POSITIONX += STEPLENGTH*math.cos(gyroangle1/90*math.pi)
         XARRAY.append(POSITIONX)
